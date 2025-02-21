@@ -107,9 +107,12 @@ def run_attack(model, begin_id, end_id):
             if i > end_id:
                 break
             continue
-        result += res.content 
         if res.refusal is not None:
             result = res.refusal
+        elif res.content is not None:
+            result += res.content
+        else:
+            result = "No response"
         logging.warning(f"LLM response: {result}")
         question_list.append(real_question)
         answer_list.append(result)
@@ -128,10 +131,11 @@ if __name__ == "__main__":
     
     # MODEL = "o1-2024-12-17"
     # MODEL = "gpt-4o-2024-08-06"
-    MODEL = "gpt-4o-mini"
+    MODEL = "gpt-4o-2024-11-20"
+    # MODEL = "gpt-4o-mini"
     # [begin_id, end_id]
     begin_id = 0
-    end_id = 387
+    end_id = 100
     
     log_file_name=f"logs/jailbreak_{MODEL}_{begin_id}_{end_id}.log"
     logging.basicConfig(filename=log_file_name, level=logging.WARNING)
