@@ -1,0 +1,17 @@
+WARNING:root:-----------Log Start-----------
+WARNING:root:Start time: 2025-02-21 08:57:12.706281
+WARNING:root:Log model: gpt-4o-mini
+WARNING:root:Begin id: 0
+WARNING:root:End id: 387
+WARNING:root:Max parallel tasks: 50
+WARNING:root:Total questions: 388
+WARNING:root:Save the result into output/attack_result_gpt-4o-mini_0_387.csv
+WARNING:root:End time: 2025-02-21 08:58:03.521324
+WARNING:root:-----------Log End-----------
+WARNING:root:-----------Log Start-----------
+WARNING:root:Start time: 2025-02-21 09:03:40.952982
+WARNING:root:Model: gpt-4o-mini, Range: 0-387, Max tasks: 50, Max attempts: 3
+WARNING:root:Total questions: 388
+WARNING:root:Result saved: output/attack_result_gpt-4o-mini_0_387_pass@3.csv
+WARNING:root:End time: 2025-02-21 09:04:28.877130
+WARNING:root:-----------Log End-----------

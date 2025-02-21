@@ -1,0 +1,12 @@
+WARNING:root:-----------Log Start-----------
+WARNING:root:Start time: 2025-02-21 08:16:04.190868
+WARNING:root:Log model: gpt-4o-mini
+WARNING:root:Begin id: 100
+WARNING:root:End id: 199
+WARNING:root:Max parallel tasks: 50
+ERROR:root:Error: Error code: 400 - {'error': {'message': 'Invalid schema for response_format \'attack\': In context=(\'properties\', \'prefix\'), " is not allowed in string literals for structured outputs (strict=true).', 'type': 'invalid_request_error', 'param': 'response_format', 'code': None}}
+ERROR:root:Error: Error code: 400 - {'error': {'message': 'Invalid schema for response_format \'attack\': In context=(\'properties\', \'prefix\'), " is not allowed in string literals for structured outputs (strict=true).', 'type': 'invalid_request_error', 'param': 'response_format', 'code': None}}
+ERROR:root:Error: Error code: 400 - {'error': {'message': 'Invalid schema for response_format \'attack\': In context=(\'properties\', \'prefix\'), " is not allowed in string literals for structured outputs (strict=true).', 'type': 'invalid_request_error', 'param': 'response_format', 'code': None}}
+WARNING:root:Save the result into output/attack_result_gpt-4o-mini_100_199.csv
+WARNING:root:End time: 2025-02-21 08:16:19.846973
+WARNING:root:-----------Log End-----------
