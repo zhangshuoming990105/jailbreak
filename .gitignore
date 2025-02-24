@@ -1,6 +1,7 @@
 test
 playground
 3rdparty
+trash
 .env
 .vscode
 __pycache__
