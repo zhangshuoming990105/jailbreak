@@ -1,6 +1,7 @@
-from anthropic import Anthropic
 from openai import OpenAI
 import os
+from loguru import logger
+import sys
 
 MODEL_TYPE_MAP = {
     # OPENAI series
@@ -17,6 +18,13 @@ MODEL_TYPE_MAP = {
     "claude-3-5-sonnet-20241022": "anthropic",
     "claude-3-5-haiku-20241022": "anthropic",
     "claude-3-opus-20240229": "anthropic",
+    # GEMINI series
+    "gemini-1.5-flash-8b-latest": "gemini",
+    "gemini-1.5-pro-latest": "gemini",
+    "gemini-2.0-flash": "gemini",
+    "gemini-2.0-flash-lite": "gemini",
+    "gemini-2.0-pro-exp": "gemini",
+    
     # Deepseek series
     "deepseek-reasoner": "deepseek",
     "deepseek-chat": "deepseek",
@@ -33,7 +41,8 @@ MODEL_TYPE_MAP = {
     "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B": "vllm",
 }
 
-def get_client(model_type):
+
+def get_client(model_type: str) -> OpenAI:
     # Create and return the appropriate client instance based on model_type
     if model_type == "openai":
         api_key = os.getenv("OPENAI_API_KEY")
@@ -55,12 +64,31 @@ def get_client(model_type):
         api_key = os.getenv("ANTHROPIC_API_KEY")
         if not api_key:
             raise ValueError("ANTHROPIC_API_KEY not set")
-        return Anthropic(api_key=api_key)
+        return OpenAI(
+            api_key=api_key,
+            base_url="https://api.anthropic.com/v1/",  # Anthropic's API endpoint
+        )
+    elif model_type == "gemini":
+        api_key = os.getenv("GEMINI_API_KEY")
+        if not api_key:
+            raise ValueError("GEMINI_API_KEY not set")
+        return OpenAI(
+            api_key=api_key,
+            base_url="https://generativelanguage.googleapis.com/v1beta/openai/",  # Gemini's API endpoint
+        )
     elif model_type == "vllm":
-        client = OpenAI(
+        return OpenAI(
             base_url="http://localhost:8080/v1",
             api_key="local",
         )
-        return client
     else:
         raise ValueError("Unsupported model type")
+
+
+def get_logger(log_level="INFO", log_file=None):
+    logger.remove()
+    logger.add(
+        log_file if log_file else sys.stderr,
+        level=log_level,
+    )
+    return logger
