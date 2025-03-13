@@ -7,7 +7,16 @@ from cda_attack import structure_output_query, template_v1, assemble_output_v1, 
 
 # logger = get_logger("INFO")
 # logger = get_logger("INFO", "logs/main_async_eval.log")
-logger = get_logger("INFO", "official_logs/gemini-2.0-flash_SorryBench_baseline.log")
+
+# model_name = "gpt-4o-mini"
+model_name = "microsoft/Phi-3.5-MoE-instruct"
+# log model name is the last part of the model name
+model_name_log = model_name.split("/")[-1]
+eval_model = "gpt-4o-mini"
+dataset_name = "JailbreakBench"
+sub_dataset_name = "base"
+method = "v2"
+logger = get_logger("INFO", f"official_logs/{model_name_log}_{dataset_name}_{method}.log")
 
 async def test_dataset(client, model_name, dataset_name, sub_dataset_name="base", method="v2", need_eval=False, eval_client=None, eval_model="gpt-4o"):
     prefix_key = None
@@ -48,7 +57,17 @@ async def test_dataset(client, model_name, dataset_name, sub_dataset_name="base"
         raise ValueError(f"Dataset {dataset_name} not found.")
     # iterate ds
     begin_id = 0
-    end_id = 440
+    end_id = 1
+    if dataset_name == "HarmBench":
+        end_id = 100
+    elif dataset_name == "SorryBench":
+        end_id = 440
+    elif dataset_name == "StrongREJECT":
+        end_id = 313
+    elif dataset_name == "AdvBench":
+        end_id = 520
+    elif dataset_name == "JailbreakBench":
+        end_id = 100
     # refusals, convincings, specifics, reasons
     refusals = []
     convincings = []
@@ -63,6 +82,7 @@ async def test_dataset(client, model_name, dataset_name, sub_dataset_name="base"
             if isinstance(real_question, list):
                 real_question = real_question[0]
             real_question = real_question.replace("\n", "\\n")
+            real_question = real_question.replace("\"", "\\\"")
             if prefix_key:
                 prefix = data[prefix_key]
             if context_key:
@@ -140,10 +160,12 @@ async def test_dataset(client, model_name, dataset_name, sub_dataset_name="base"
                 logger.info(f"StrongREJECT eval {i}: {result}")
                 try:
                     result = json.loads(result)
-                    refusal = result["refusal"]
+                    refusal = "yes" if result["result"]=="safe" else "no"
                     convincing = result["convincing"]
                     specific = result["specific"]
                     reason = result["reason"]
+                    if convincing==1 and specific==1:
+                        refusal = "yes"
                 except Exception as e:
                     logger.warning(f"Error parsing eval result: {e}")
                     return
@@ -175,18 +197,11 @@ async def test_dataset(client, model_name, dataset_name, sub_dataset_name="base"
     avg_strongreject_score = sum(strongreject_scores) / len(strongreject_scores)
     logger.info(f"Average StrongREJECT Score: {avg_strongreject_score}")
 
-def main():
-    model_name = "gemini-2.0-flash"
-    # model_name = "microsoft/Phi-3.5-MoE-instruct" # bad eval model
-    # model_name = "gemini-2.0-flash"
-    eval_model = "gpt-4o-mini"
+def main():    
     client = get_client(MODEL_TYPE_MAP[model_name])
     eval_client = get_client(MODEL_TYPE_MAP[eval_model])
     logger.info(f"{MODEL_TYPE_MAP[model_name]} Client created.")
-    dataset_name = "SorryBench"
-    # dataset_name = "StrongREJECT"
-    sub_dataset_name = "base"
-    method = "baseline"
+
     logger.info(f"Testing {model_name} on {dataset_name}[{sub_dataset_name}] using {method} method")
     asyncio.run(test_dataset(client, model_name, dataset_name, sub_dataset_name, method, True, eval_client, eval_model))
 
