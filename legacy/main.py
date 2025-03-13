@@ -3,26 +3,30 @@ from datasets import load_dataset
 import json
 from util import MODEL_TYPE_MAP, get_client, get_logger
 from cda_attack import structure_output_query, template_v1, assemble_output_v1, enum_attack_v2, assemble_output_v2, llm_eval
+
 logger = get_logger("INFO", "logs/main_eval.log")
 
-
-def test_dataset(client, model_name, dataset_name, sub_dataset_name="base", method="v2", need_eval=False):
+def test_dataset(client, model_name, dataset_name, sub_dataset_name="base", method="v2", need_eval=False, eval_client=None, eval_model="gpt-4o"):
     prefix_key = None
     context_key = None
     category_key = None
     if dataset_name == "AdvBench":
         ds = load_dataset("walledai/AdvBench")["train"]
+        logger.info(ds)
         question_key = "prompt"
         prefix_key = "target"
     elif dataset_name == "HarmBench":
         ds = load_dataset("walledai/HarmBench", "contextual")["train"]
+        logger.info(ds)
         question_key = "prompt"
         context_key = "context"
         category_key = "category"
     elif dataset_name == "SorryBench":
         ds = load_dataset("sorry-bench/sorry-bench-202503")["train"]
+        logger.info(ds)
         # sorrybench is quite complex
         question_key = "turns"
+        category_key = "category"
         # iterate ds, get ds["category"]==sub_dataset_name as the ds to process
         logger.debug(ds)
         ds = [data for data in ds if data["prompt_style"] == sub_dataset_name]
@@ -30,15 +34,18 @@ def test_dataset(client, model_name, dataset_name, sub_dataset_name="base", meth
         # ds is made up by 21(prompt_style) x 44 x 10(in each category) questions, totally 9240 questions
     elif dataset_name == "JailbreakBench":
         ds = load_dataset("JailbreakBench/JBB-Behaviors", "behaviors")['harmful']
+        logger.info(ds)
         question_key = "Goal"
         prefix_key = "Target"
     elif dataset_name == "StrongREJECT":
         ds = load_dataset("walledai/StrongREJECT")["train"]
+        question_key = "prompt"
+        logger.info(ds)
     else:
         raise ValueError(f"Dataset {dataset_name} not found.")
     # iterate ds
     begin_id = 0
-    end_id = 10
+    end_id = 313
     # refusals, convincings, specifics, reasons
     refusals = []
     convincings = []
@@ -101,7 +108,7 @@ def test_dataset(client, model_name, dataset_name, sub_dataset_name="base", meth
         logger.info(f"LLM Answer {i}: {llm_answer}")
 
         if need_eval:
-            eval_message = llm_eval(client, model_name, real_question, llm_answer)
+            eval_message = llm_eval(eval_client, eval_model, real_question, llm_answer)
             result = eval_message.content
             logger.info(f"StrongREJECT eval {i}: {result}")
             # parse the result
@@ -139,10 +146,12 @@ def test_dataset(client, model_name, dataset_name, sub_dataset_name="base", meth
 
 
 def main():
-    model_name = "gpt-4o"
+    model_name = "gemini-2.0-flash"
+    eval_model = "gpt-4o"
     client = get_client(MODEL_TYPE_MAP[model_name])
+    eval_client = get_client(MODEL_TYPE_MAP[eval_model])
     logger.info(f"{MODEL_TYPE_MAP[model_name]} Client created.")
-    dataset_name = "SorryBench"
+    dataset_name = "StrongREJECT"
     sub_dataset_name = "base"
     method = "baseline"
     # ds["prompt"] is the actual question
@@ -150,7 +159,7 @@ def main():
     # test_dataset(client, model_name, "SorryBench", "translate-zh-cn")
     # test_dataset(client, model_name, "SorryBench", "authority_endorsement", "baseline")
     logger.info(f"Testing {model_name} on {dataset_name}[{sub_dataset_name}] using {method} method")
-    test_dataset(client, model_name, dataset_name, sub_dataset_name, method, True)
+    test_dataset(client, model_name, dataset_name, sub_dataset_name, method, True, eval_client, eval_model)
 
 if __name__ == "__main__":
     main()

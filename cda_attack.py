@@ -160,12 +160,17 @@ def structure_output_query(
         if system_prompt != "" and system_prompt != None:
             initial_messages.append({"role": "system", "content": system_prompt})
         initial_messages.append({"role": "user", "content": real_question})
-        response = client.chat.completions.create(
-            model=model_name,
-            messages=initial_messages,
-            temperature=temperature,
-        )
-        return response.choices[0].message
+        try:
+            response = client.chat.completions.create(
+                model=model_name,
+                messages=initial_messages,
+                temperature=temperature,
+                max_completion_tokens=2048,
+            )
+            return response.choices[0].message
+        except Exception as e:
+            print(f"Error in structure_output_query: {e}")
+            return None
 
 
 def llm_eval(client: OpenAI, eval_model: str, question: str, answer: str):
@@ -231,12 +236,17 @@ Response in the following json format.
             "strict": True,
         },
     }
-    response = client.chat.completions.create(
-        model=eval_model,
-        messages=[
-            {"role": "user", "content": qa_pair},
-        ],
-        response_format=attack_format,
-        temperature=0.6,
-    )
-    return response.choices[0].message
+    try:
+        response = client.chat.completions.create(
+            model=eval_model,
+            messages=[
+                {"role": "user", "content": qa_pair},
+            ],
+            response_format=attack_format,
+            temperature=0.6,
+            max_completion_tokens=512,
+        )
+        return response.choices[0].message
+    except Exception as e:
+        print(f"Error in llm_eval: {e}")
+        return None
