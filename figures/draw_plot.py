@@ -174,8 +174,8 @@ bench_list = list(benchmarks.items())
 for idx, (bench, data) in enumerate(bench_list):
     ax = axs[idx]
     # 绘制 ASR 柱状图
-    ax.bar(x - width/2, data["base"], width, color="tab:blue")   # ASR Baseline
-    ax.bar(x + width/2, data["cda"], width, color="tab:orange")    # ASR CDA
+    bars_base = ax.bar(x - width/2, data["base"], width, color="tab:blue")   # ASR Baseline
+    bars_cda = ax.bar(x + width/2, data["cda"], width, color="tab:orange")    # ASR CDA
     ax.set_title(bench)
     ax.set_xticks(x)
     ax.set_xticklabels(models, rotation=45, ha="right")
@@ -183,14 +183,30 @@ for idx, (bench, data) in enumerate(bench_list):
     ax.set_ylim(0, 1)  # 统一 ASR y 轴范围
     ax.grid(True, linestyle="--", alpha=0.6)
     
+    # 修改数值标注的位置，增加一个垂直偏移量避免重叠
+    for bar in bars_base:
+        height = bar.get_height()
+        ax.text(bar.get_x() + bar.get_width()/2, height + 0.02, f'{height:.3f}', 
+                ha='center', va='bottom', fontsize=10, color='tab:blue')
+    for bar in bars_cda:
+        height = bar.get_height()
+        ax.text(bar.get_x() + bar.get_width()/2, height + 0.02, f'{height:.3f}', 
+                ha='center', va='bottom', fontsize=10, color='tab:orange')
+    
     # 右侧 y 轴绘制 StrongREJECT Score 折线图，使用不同颜色
     ax2 = ax.twinx()
     s_base = strongreject[bench]["base"]
     s_cda = strongreject[bench]["cda"]
-    ax2.plot(x, s_base, marker='s', linestyle='--', color='tab:green')   # StrongREJECT Baseline
-    ax2.plot(x, s_cda, marker='^', linestyle='--', color='tab:red')       # StrongREJECT CDA
+    line1 = ax2.plot(x, s_base, marker='s', linestyle='--', color='tab:green')[0]   # StrongREJECT Baseline
+    line2 = ax2.plot(x, s_cda, marker='^', linestyle='--', color='tab:red')[0]       # StrongREJECT CDA
     ax2.set_ylabel("StrongREJECT Score")
     ax2.set_ylim(0, 1)  # 统一 StrongREJECT y 轴范围
+    
+    # 标注 StrongREJECT 折线图的数据点
+    for xi, yi in zip(x, s_base):
+        ax2.text(xi, yi + 0.02, f'{yi:.3f}', ha='center', va='bottom', fontsize=10, color='tab:green')
+    for xi, yi in zip(x, s_cda):
+        ax2.text(xi, yi + 0.02, f'{yi:.3f}', ha='center', va='bottom', fontsize=10, color='tab:red')
     
 # 将第6个子图作为图例区（原空白）
 axs[-1].clear()

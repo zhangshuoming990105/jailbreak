@@ -8,8 +8,8 @@ from cda_attack import structure_output_query, template_v1, assemble_output_v1, 
 # logger = get_logger("INFO")
 # logger = get_logger("INFO", "logs/main_async_eval.log")
 
-# model_name = "gpt-4o-mini"
-model_name = "microsoft/Phi-3.5-MoE-instruct"
+model_name = "gpt-4o-mini"
+# model_name = "microsoft/Phi-3.5-MoE-instruct"
 # log model name is the last part of the model name
 model_name_log = model_name.split("/")[-1]
 eval_model = "gpt-4o-mini"
