@@ -39,6 +39,10 @@ MODEL_TYPE_MAP = {
     "microsoft/Phi-3.5-MoE-instruct": "vllm",
     "llama3/Meta-Llama-3-70B-Instruct": "vllm",
     "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B": "vllm",
+    "google/gemma-2-9b-it": "vllm",
+    "mistralai/Mistral-Nemo-Instruct-2407": "vllm",
+    "Qwen/Qwen2.5-32B-Instruct": "vllm",
+    "meta-llama/Llama-3.1-8B-Instruct": "vllm",
 }
 
 
@@ -51,7 +55,7 @@ def get_client(model_type: str) -> OpenAI:
         return OpenAI(api_key=api_key, base_url="https://api.openai.com/v1")
     elif model_type == "deepseek":
         return OpenAI(
-            base_url="https://api.deepseek.ai/v1", api_key=os.getenv("DEEPSEEK_API_KEY")
+            base_url="https://api.deepseek.com/v1", api_key=os.getenv("DEEPSEEK_API_KEY")
         )
     elif model_type == "siliconflow":
         api_key = os.getenv("SILICONFLOW_API_KEY")
