@@ -8,37 +8,48 @@ vllm_outlines = [0.987, 0.884]
 sglang_xgrammar = [0.994, 0.926]
 sglang_outlines = [0.979, 0.909]
 
-# draw a bar chart with two bars, range from 0 to 1
-# in 4 settings together in a chart
-x = np.arange(2)  # the label locations
-width = 0.15  # the width of the bars
-fig, ax = plt.subplots(figsize=(11, 5))  # 修改为扁一点的图形
-rects1 = ax.bar(x - width, vllm_xgrammar, width, label="VLLM XGrammar")
-rects2 = ax.bar(x, vllm_outlines, width, label="VLLM Outlines")
-rects3 = ax.bar(x + width, sglang_xgrammar, width, label="SGLang XGrammar")
-rects4 = ax.bar(x + 2 * width, sglang_outlines, width, label="SGLang Outlines")
-# Add some text for labels, title and custom x-axis tick labels, etc.
-ax.set_ylabel("Scores", fontsize=16)  # 修改为较大字体
-ax.set_title("Enum Attack on Llama-3.1-8B with different backends", fontsize=16)  # 修改为较大字体
-ax.set_xticks(x + width / 2)
-ax.set_xticklabels(["ASR", "StrongREJECT"])
-ax.tick_params(axis="both", labelsize=14)  # 设置坐标轴刻度字体大小
-# 调整图例放置在图表下方居中，不与图形重叠
-ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.05), ncol=4, fontsize=12)
+# 修改：创建两个子图
+width = 0.15  # 柱状图宽度
+fig, axs = plt.subplots(1, 2, figsize=(11, 5))
+metrics = ["ASR", "StrongREJECT"]
+scores = [
+    [vllm_xgrammar[0], vllm_outlines[0], sglang_xgrammar[0], sglang_outlines[0]],
+    [vllm_xgrammar[1], vllm_outlines[1], sglang_xgrammar[1], sglang_outlines[1]]
+]
+labels = ["VLLM XGrammar", "VLLM Outlines", "SGLang XGrammar", "SGLang Outlines"]
 
-ax.set_ylim(0, 1.05)
-def autolabel(rects):
-    """Attach a text label above each bar in *rects*, displaying its height."""
-    for rect in rects:
-        height = rect.get_height()
-        ax.annotate(f"{height:.3f}",
-                    xy=(rect.get_x() + rect.get_width() / 2, height),
-                    xytext=(0, 1),  # 3 points vertical offset
-                    textcoords="offset points",
-                    ha='center', va='bottom',
-                    fontsize=12)  # 设置数值注解的字体大小
-autolabel(rects1)
-autolabel(rects2)
-autolabel(rects3)
-autolabel(rects4)
-plt.savefig("figures/backend_diff.pdf")
+for i, ax in enumerate(axs):
+    # 绘制每个子图上的四个柱状图（只有一个柱状图组）
+    x_pos = np.array([0])
+    r1 = ax.bar(x_pos - width, scores[i][0], width, label=labels[0])
+    r2 = ax.bar(x_pos,         scores[i][1], width, label=labels[1])
+    r3 = ax.bar(x_pos + width,   scores[i][2], width, label=labels[2])
+    r4 = ax.bar(x_pos + 2*width, scores[i][3], width, label=labels[3])
+    ax.set_title(metrics[i], fontsize=16)  # 设置子图标题为指标
+    ax.set_xticks(x_pos)
+    ax.set_xticklabels([""])  # 不需要显示 x 刻度标签
+    ax.tick_params(axis="both", labelsize=14)
+    ax.set_ylim(0, 1.05)
+    # 数值注解函数（共用）
+    def autolabel(rects):
+        for rect in rects:
+            height = rect.get_height()
+            ax.annotate(f"{height:.3f}",
+                        xy=(rect.get_x() + rect.get_width() / 2, height),
+                        xytext=(0, 1),
+                        textcoords="offset points",
+                        ha='center', va='bottom',
+                        fontsize=12)
+    autolabel(r1)
+    autolabel(r2)
+    autolabel(r3)
+    autolabel(r4)
+
+# 添加共用 y 轴标签
+# fig.text(0.04, 0.5, 'Scores', va='center', rotation='vertical', fontsize=16)
+# 共用图例，放在图表下方居中
+fig.legend(labels, loc="upper center", bbox_to_anchor=(0.5, -0.05), ncol=4, fontsize=12)
+plt.suptitle("Enum Attack on Llama-3.1-8B with different backends", fontsize=16)
+# 调整布局以显示图例
+plt.tight_layout(rect=[0, 0.05, 1, 1])
+plt.savefig("figures/backend_diff.pdf", bbox_inches="tight")
