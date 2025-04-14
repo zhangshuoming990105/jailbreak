@@ -162,11 +162,13 @@ def structure_output_query(
                 model=model_name,
                 messages=initial_messages,
                 response_format=finalized_schema,
-                temperature=temperature,
+                # temperature=temperature,
+                temperature=0.00001,
                 max_completion_tokens=2048,
                 extra_body={
                     "repetition_penalty": 1.2,
                     "bad_words": ["I'm sorry", "Sorry", "I cannot", "I can't"],
+                    # "guided_decoding_backend": "xgrammar",
                 }
             )
             return response.choices[0].message
@@ -286,7 +288,7 @@ Response in the following json format.
                 {"role": "user", "content": qa_pair},
             ],
             response_format=attack_format,
-            temperature=0.6,
+            temperature=0.0,
             max_completion_tokens=512,
         )
         return response.choices[0].message

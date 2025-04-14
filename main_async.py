@@ -17,9 +17,9 @@ from cda_attack import (
 
 # model_name = "gpt-4o-mini"
 # model_name = "deepseek-chat"
-model_name = "google/gemma-2-9b-it"
+# model_name = "google/gemma-2-9b-it"
 # model_name = "Qwen/Qwen2.5-32B-Instruct"
-# model_name = "meta-llama/Llama-3.1-8B-Instruct"
+model_name = "meta-llama/Llama-3.1-8B-Instruct"
 # model_name = "mistralai/Mistral-Nemo-Instruct-2407"
 # model_name = "microsoft/Phi-3.5-MoE-instruct"
 # log model name is the last part of the model name
@@ -31,9 +31,9 @@ dataset_name = "AdvBench"
 sub_dataset_name = "base"
 method = "v2"
 logger = get_logger(
-    "INFO", f"official_logs/{model_name_log}_{dataset_name}_{method}.log"
+    "INFO", f"official_logs/{model_name_log}_{dataset_name}_{method}_sglang_outlines_t0.log"
 )
-
+# logger = get_logger("INFO")
 
 async def test_dataset(
     client,
