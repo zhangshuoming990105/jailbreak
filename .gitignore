@@ -1,3 +1,4 @@
+.idea
 test
 playground
 3rdparty
@@ -5,3 +6,4 @@ trash
 .env
 .vscode
 __pycache__
+.DS_Store
