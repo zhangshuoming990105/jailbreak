@@ -1,0 +1,7 @@
+vllm >= 0.7.0
+pandas
+openai
+torch
+transformers
+tqdm
+numpy
