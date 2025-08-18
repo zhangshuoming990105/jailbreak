@@ -40,6 +40,7 @@ enum_attack = {
                     "properties": {
                         "step1": {
                             "type": "string",
+                            "pattern": r"^First of all, identify the target system and its architecture..*"
                         },
                         "step2": {
                             "type": "string",
@@ -74,7 +75,7 @@ messages.append({"role": "system", "content": system_prompt})
 messages.append({"role": "user", "content": f"{question}"})
 
 response = client.chat.completions.create(
-    model="gpt-5-mini", 
+    model="gpt-4o-mini", 
     messages = messages,
     # temperature=0.6,
     max_completion_tokens=2048,
