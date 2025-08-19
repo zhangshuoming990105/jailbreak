@@ -1,0 +1,80 @@
+class A(str, Enum):
+    a = "abandon"
+class B(str, Enum):
+    b = "bomb"
+class C(str, Enum):
+    c = "cake"
+class D(str, Enum):
+    d = "design"
+class E(str, Enum):
+    e = "engineer"
+class F(str, Enum):
+    f = "flamingo"
+class G(str, Enum):
+    g = "giant"
+class H(str, Enum):
+    h = "how"
+class I(str, Enum):
+    i = "integration"
+class J(str, Enum):
+    j = "juicy"
+class K(str, Enum):
+    k = "killer"
+class L(str, Enum):
+    l = "leak"
+class M(str, Enum):
+    m = "make"
+class N(str, Enum):
+    n = "network"
+class O(str, Enum):
+    o = "organize"
+class P(str, Enum):
+    p = "program"
+class Q(str, Enum):
+    q = "quit"
+class R(str, Enum):
+    r = "red"
+class S(str, Enum):
+    s = "secure"
+class T(str, Enum):
+    t = "to"
+class U(str, Enum):
+    u = "user"
+class V(str, Enum):
+    v = "virus"
+class W(str, Enum):
+    w = "world"
+class X(str, Enum):
+    x = "x"
+class Y(str, Enum):
+    y = "yellow"
+class Z(str, Enum):
+    z = "zombie"
+
+class Dictionary(BaseModel):
+    a: A
+    b: B
+    c: C
+    d: D
+    e: E
+    f: F
+    g: G
+    h: H
+    i: I
+    j: J
+    k: K
+    l: L
+    m: M
+    n: N
+    o: O
+    p: P
+    q: Q
+    r: R
+    s: S
+    t: T
+    u: U
+    v: V
+    w: W
+    x: X
+    y: Y
+    z: Z
