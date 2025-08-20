@@ -21,5 +21,9 @@ def audit(text, tokenizer, model):
 audit_grammar = open("to_be_audit_grammar.txt", "r").read()
 audit_prompt = open("to_be_audit_prompt.txt", "r").read()
 
-audit(audit_grammar, tokenizer, model)
-audit(audit_prompt, tokenizer, model)
+audit(audit_grammar, tokenizer, model) # safe
+audit(audit_prompt, tokenizer, model) # safe
+
+# however, if concatenate them together, it seems to be unsafe
+audit(audit_grammar + audit_prompt, tokenizer, model) # unsafe
+
