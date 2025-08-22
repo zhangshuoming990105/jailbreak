@@ -12,6 +12,11 @@ MODEL_TYPE_MAP = {
     "gpt-4o-mini-2024-07-18": "openai",
     "o1-2024-12-17": "openai",
     "o3-mini-2025-01-31": "openai",
+    "gpt-4.1": "openai",
+    "gpt-4.1-mini": "openai",
+    "gpt-5-nano": "openai",
+    "gpt-5-mini": "openai",
+    "gpt-5": "openai",
     # ANTHROPIC series
     "claude-3-7-sonnet-20250219": "anthropic",
     "claude-3-5-sonnet-20240620": "anthropic",
