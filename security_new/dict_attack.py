@@ -16,23 +16,31 @@ logger.add(
 )
 
 class DictAttack:
-    def __init__(self, client: OpenAI, model: str, assemble_model: str, assemble_num: int = 10):
+    def __init__(self, client: OpenAI, model: str, assemble_client: OpenAI = None, assemble_model: str = None, assemble_num: int = 10):
         self.client = client
         self.model = model
-        self.assemble_model = assemble_model
+        if assemble_client:
+            self.assemble_client = assemble_client
+        else:
+            self.assemble_client = client
+        if assemble_model:
+            self.assemble_model = assemble_model
+        else:
+            self.assemble_model = model
         self.assemble_num = assemble_num
 
     class Payload(BaseModel):
         dictionary: Dict[str, str]
         keys: List[str]
     
-    async def request_llm(self, input, schema, model):
+    async def request_llm(self, input, schema, client: OpenAI, model):
         response = await asyncio.to_thread(
-            self.client.responses.parse,
+            client.responses.parse,
             model=model,
             input=input,
-            text_format=schema
+            text_format=schema,
         )
+        
         return response
 
     async def similar_words(self, example: str) -> List[str]:
@@ -45,7 +53,7 @@ class DictAttack:
 
         question = f"Give me {self.assemble_num} different random english words with the same start letter and similar frequency and length to the example."
         messages = question
-        r = await self.request_llm(messages, Schema, model=self.assemble_model)
+        r = await self.request_llm(messages, Schema, client=self.assemble_client, model=self.assemble_model)
         return r.output_parsed.words
 
     async def build_payload(self, question_words: List[str]) -> Payload:
@@ -144,7 +152,7 @@ class DictAttack:
             {"role": "user", "content": user_prompt}
         ]
         # Assemble the parsed output
-        r = await self.request_llm(messages, AttackSchema, model=self.model)
+        r = await self.request_llm(messages, AttackSchema, client=self.client, model=self.model)
         return r
     
     # assemble the payload, but do not query the attack
@@ -234,7 +242,7 @@ async def process_item(i, item, attack, sem, csv_lock, csv_filename):
             ]
             
             # 调用LLM
-            r = await attack.request_llm(messages, schema, model=attack.model)
+            r = await attack.request_llm(messages, schema, client=attack.client, model=attack.model)
             
             # 提取答案
             answer = r.output_parsed.stage2.answer
@@ -271,21 +279,25 @@ def write_csv_row(filename, question, answer):
 
 async def main():
     # Use OpenAI Models
-    client = OpenAI(
+    openai_client = OpenAI(
         base_url="https://api.openai.com/v1",
         api_key=os.getenv("OPENAI_API_KEY"),
     )
-    model = "gpt-4o"
+    openai_model = "gpt-4o"
     # Use vLLM Models
-    # client = OpenAI(
-    #     base_url="http://localhost:8080/v1"
-    # )
-    # model = '/home/weight/Phi-3.5-MoE-instruct'
+    local_client = OpenAI(
+        base_url="http://localhost:8080/v1"
+    )
+    local_model = '/home/weight/Phi-3.5-MoE-instruct'
+
+    # client, model = openai_client, openai_model
+    client, model = local_client, local_model
+
     ds = load_dataset("walledai/AdvBench")["train"]
     logger.info(ds)
     begin_id = 0
     end_id = 520
-    attack = DictAttack(client=client, model=model, assemble_model="gpt-4o-mini", assemble_num=3)
+    attack = DictAttack(client=client, model=model, assemble_client=openai_client, assemble_model="gpt-4o-mini", assemble_num=3)
     
     # CSV 文件名
     csv_filename = "qa_advbench_dictattack.csv"
