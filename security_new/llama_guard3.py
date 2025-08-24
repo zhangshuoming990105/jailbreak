@@ -114,6 +114,7 @@ async def eval_dictattack_with_llamaguard(assemble_model: str = "gpt-4o-mini", a
         if is_safe:
             dictattack_safe.append(i)
         else:
+            logger.info(f"Question {i} is unsafe, the audit_pattern is: {audit_pattern}")
             dictattack_unsafe.append(i)
     logger.info("--------------------------------")
     logger.info(f"Test {assemble_model} with {assemble_num} assemble_num")
@@ -124,11 +125,15 @@ async def eval_dictattack_with_llamaguard(assemble_model: str = "gpt-4o-mini", a
 
 # test enumattack
 
-eval_enumattack_with_llamaguard()
+# eval_enumattack_with_llamaguard()
 
 # test dictattck with different assemble_num
+
+asyncio.run(eval_dictattack_with_llamaguard(assemble_num=0))
+
 # asyncio.run(eval_dictattack_with_llamaguard(assemble_num=1))
 
+# not needed anymore
 # asyncio.run(eval_dictattack_with_llamaguard(assemble_num=3))
 
 # asyncio.run(eval_dictattack_with_llamaguard(assemble_num=5))

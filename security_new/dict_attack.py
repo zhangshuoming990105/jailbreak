@@ -52,9 +52,10 @@ class DictAttack:
         word_set = set()
         for word in question_words:
             assert word.islower()
-            similar_words = await self.similar_words(word)
             word_set.add(word)
-            word_set.update(similar_words)
+            if self.assemble_num > 0:
+                similar_words = await self.similar_words(word)
+                word_set.update(similar_words)
         # calc the key of each word: start letter + inner index
         # example: abandon -> a1, apple -> a2, bad -> b1, boy -> b2
         word_key_map = dict()
