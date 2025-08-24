@@ -17,6 +17,9 @@ logger.add(
 )
 
 def audit(text, tokenizer, model):
+    """
+    Audit the text with LlamaGuard3(default)
+    """
     messages = [{"role": "user", "content": text}]
     inputs = tokenizer.apply_chat_template(
         messages,
@@ -32,6 +35,20 @@ def audit(text, tokenizer, model):
         return False
     else:
         return True
+    
+def audit_omni(text) -> bool:
+    """
+    Audit the text with omni-moderation-latest
+    """
+    client = OpenAI()
+    response = client.moderations.create(
+        model="omni-moderation-latest",
+        input=text,
+    )   
+    print(response.results.flagged)
+    # if flagged, return False, otherwise return True
+    return not response.results.flagged
+
 
 from datasets import load_dataset
 
@@ -70,10 +87,11 @@ def eval_enumattack_with_llamaguard():
     logger.info(f"enumattack_safe: {enumattack_safe}")
     logger.info(f"enumattack_unsafe: {enumattack_unsafe}")
 
-async def eval_dictattack_with_llamaguard(assemble_model: str = "gpt-4o-mini", assemble_num: int = 1):
+async def eval_dictattack_with_llamaguard(assemble_model: str = "gpt-4o-mini", assemble_num: int = 1, use_omni:bool = False):
     ds = load_dataset("walledai/AdvBench")["train"]
-    tokenizer = AutoTokenizer.from_pretrained("meta-llama/Llama-Guard-3-8B")
-    model = AutoModelForCausalLM.from_pretrained("meta-llama/Llama-Guard-3-8B")
+    if not use_omni:
+        tokenizer = AutoTokenizer.from_pretrained("meta-llama/Llama-Guard-3-8B")
+        model = AutoModelForCausalLM.from_pretrained("meta-llama/Llama-Guard-3-8B")
     client = OpenAI()
     # using assemble_model to create payload, the model is not used here
     attack = DictAttack(client=client, model="gpt-4o", assemble_model=assemble_model, assemble_num=assemble_num)
@@ -110,14 +128,19 @@ async def eval_dictattack_with_llamaguard(assemble_model: str = "gpt-4o-mini", a
 """
         if i == 0:
             logger.info(audit_pattern)
-        is_safe = audit(audit_pattern, tokenizer, model)
+        if not use_omni:
+            is_safe = audit(audit_pattern, tokenizer, model)
+        else:
+            is_safe = audit_omni(audit_pattern)
         if is_safe:
             dictattack_safe.append(i)
         else:
             logger.info(f"Question {i} is unsafe, the audit_pattern is: {audit_pattern}")
             dictattack_unsafe.append(i)
+        if i == 520:
+            break
     logger.info("--------------------------------")
-    logger.info(f"Test {assemble_model} with {assemble_num} assemble_num")
+    logger.info(f"Test {assemble_model} with {assemble_num} assemble_num using {"llama_guard3" if not use_omni else "omni-moderation-latest"}")
     logger.info(f"dictattack_safe: {len(dictattack_safe)}")
     logger.info(f"dictattack_unsafe: {len(dictattack_unsafe)}")
     logger.info(f"dictattack_safe: {dictattack_safe}")
@@ -131,7 +154,7 @@ async def eval_dictattack_with_llamaguard(assemble_model: str = "gpt-4o-mini", a
 
 asyncio.run(eval_dictattack_with_llamaguard(assemble_num=0))
 
-# asyncio.run(eval_dictattack_with_llamaguard(assemble_num=1))
+# asyncio.run(eval_dictattack_with_llamaguard(assemble_num=1)) # 100% safe
 
 # not needed anymore
 # asyncio.run(eval_dictattack_with_llamaguard(assemble_num=3))
