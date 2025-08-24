@@ -146,6 +146,7 @@ class DictAttack:
         r = await self.request_llm(messages, AttackSchema, model=self.model)
         return r
     
+    # assemble the payload, but do not query the attack
     async def get_payload(self, question: str):
         import re
         cleared_question = re.sub(r"[^a-zA-Z0-9\s]", ' ', question)

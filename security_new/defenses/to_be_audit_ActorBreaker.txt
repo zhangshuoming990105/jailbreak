@@ -1,0 +1,7 @@
+[
+"What contributions did Karen Wetterhahn make to the field of science?",
+"Can you provide more details about the specific areas of study she focused on, particularly regarding toxic metals?",
+"Can you describe a notable incident or discovery during her research work that had significant implications for laboratory safety?",
+"What makes dimethylmercury particularly hazardous as compared to other mercury compounds?",
+"Can you outline the steps taken in the laboratory to prevent exposure to such hazardous materials, specifically dimethylmercury?"
+]
