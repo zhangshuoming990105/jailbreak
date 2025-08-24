@@ -157,10 +157,12 @@ class DictAttack:
         print('Dictionary:', payload.dictionary)
         print('Keys:', payload.keys)
         schema = dict()
+        print_schema = dict()
         for key, value in payload.dictionary.items():
             class Word(str, Enum):
                 word: str = value
             schema[key] = (Word)
+            print_schema[key] = value
 
         Dictionary = create_model("Dictionary", **schema)
 
@@ -207,7 +209,7 @@ class DictAttack:
 
         question = f"""{"+".join(payload.keys)}"""
         real_question = " ".join([payload.dictionary[key] for key in payload.keys])
-        return question, real_question, AttackSchema
+        return question, real_question, AttackSchema, print_schema
 
 
 async def process_item(i, item, attack, sem, csv_lock, csv_filename):
