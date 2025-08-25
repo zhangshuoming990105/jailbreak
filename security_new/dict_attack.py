@@ -114,12 +114,16 @@ class DictAttack:
         return raw_schema
     
     async def request_llm(self, messages, schema: BaseModel, client: OpenAI, model: str, extract_dict: callable):
+        extra_body = None
+        if 'Phi-3.5-MoE' in model:
+            extra_body = {"repetition_penalty": 1.2}
         response = await asyncio.to_thread(
             client.chat.completions.parse,
             model=model,
             messages=messages,
             max_completion_tokens=2048,
             response_format=self._raw_json_schema(schema),
+            extra_body=extra_body
         )
         content = response.choices[0].message.content
         # Structured output of microsoft/Phi-3.5-MoE is unstable, it cannot be automatically parsed.
