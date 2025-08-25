@@ -28,6 +28,7 @@ local_client = OpenAI(
 local_model = '/home/weight/Phi-3.5-MoE-instruct'
 
 client, model = openai_client, openai_model
+# client, model = local_client, local_model
 
 class DictAttack:
     def __init__(self, client: OpenAI, model: str, assemble_client: OpenAI = None, assemble_model: str = None, assemble_num: int = 10):
@@ -126,7 +127,7 @@ class DictAttack:
         try:
             answer = json.loads(content)
             return extract_dict(answer)
-        except json.decoder.JSONDecodeError:
+        except Exception:
             return content
 
     async def similar_words(self, example: str) -> List[str]:
