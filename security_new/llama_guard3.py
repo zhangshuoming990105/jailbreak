@@ -41,8 +41,10 @@ def audit_llamaguard_vllm(text):
     )
     content = response.choices[0].message.content
     if "unsafe" in content.lower():
+        print("llamaguard: unsafe")
         return False
     else:
+        print("llamaguard: safe")
         return True
     
 async def audit_omni(text) -> bool:
@@ -160,8 +162,6 @@ def eval_enumattack_with_llamaguard(use_omni: bool = False):
 async def eval_dictattack_with_llm(assemble_model: str = "gpt-4o-mini", assemble_num: int = 1, judge_model: str = "gpt-4o"):
     ds = load_dataset("walledai/AdvBench")["train"]
     key = "prompt"
-    dictattack_safe = []
-    dictattack_unsafe = []
     client = get_llm_client('openai')
     attack = DictAttack(client=client, model="gpt-4o", assemble_model=assemble_model, assemble_num=assemble_num)
         
@@ -219,8 +219,12 @@ class Dictionary(BaseModel):
             if judge_model == "moderation_api":
                 is_safe = await audit_omni(audit_pattern)
             else:
-                is_safe = await audit_llm(audit_pattern, judge_model)
+    
             # is_safe = audit_omni(audit_pattern)
+            if judge_model == 'llamaguard':
+                is_safe = audit_llamaguard_vllm(audit_pattern)
+            else:
+                is_safe = await audit_llm(audit_pattern, judge_model)
            
             if is_safe:
                 logger.info(f"Question {i} is safe, the audit_pattern is: {audit_pattern}")
@@ -289,7 +293,7 @@ async def eval_dictattack_with_llamaguard(assemble_model: str = "gpt-4o-mini", a
             logger.info(audit_pattern)
         if not use_omni:
             # is_safe = audit(audit_pattern, tokenizer, model)
-            is_safe = audit_llamaguard_vllm(audit_pattern)
+            is_safe = await audit_llamaguard_vllm(audit_pattern)
         else:
             is_safe = audit_omni(audit_pattern)
         if is_safe:
@@ -310,6 +314,7 @@ async def eval_dictattack_with_llamaguard(assemble_model: str = "gpt-4o-mini", a
     logger.info(f"dictattack_unsafe: {dictattack_unsafe}")
 
 
+asyncio.run(eval_dictattack_with_llm(assemble_num=1,judge_model="gpt-4o"))
 asyncio.run(eval_dictattack_with_llm(assemble_num=1,judge_model="gpt-4o"))
 
 # test enumattack
