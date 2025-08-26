@@ -9,7 +9,7 @@ from dict_attack import DictAttack
 from pydantic import BaseModel
 from loguru import logger
 
-log_file = "audit_enumattack_omni.log"
+log_file = "audit_enumattack_sorrybench.log"
 logger.remove()
 logger.add(
     log_file if log_file else sys.stderr,
@@ -69,7 +69,18 @@ def replace_placeholder(template: str, text, placeholder="PLACEHOLDER"):
     return template.replace(placeholder, text)
 
 def eval_enumattack_with_llamaguard(use_omni: bool = False):
-    ds = load_dataset("walledai/AdvBench")["train"]
+    # ds = load_dataset("walledai/StrongREJECT")["train"]
+    # key = "prompt"
+    # ds = load_dataset("walledai/HarmBench", "contextual")["train"]
+    # key = "prompt"
+    # ds = load_dataset("JailbreakBench/JBB-Behaviors", "behaviors")["harmful"]
+    # key = "Goal"
+    ds = load_dataset("sorry-bench/sorry-bench-202503")["train"]
+    key = "turns"
+    ds = [data for data in ds if data["prompt_style"] == "base"]
+    logger.info(f"Category base size: {len(ds)}")
+    # ds = load_dataset("walledai/AdvBench")["train"]
+    # key = "prompt"
     if not use_omni:
         tokenizer = AutoTokenizer.from_pretrained("meta-llama/Llama-Guard-3-8B")
         model = AutoModelForCausalLM.from_pretrained("meta-llama/Llama-Guard-3-8B")
@@ -79,7 +90,9 @@ def eval_enumattack_with_llamaguard(use_omni: bool = False):
     enumattack_unsafe = []
     for i in range(len(ds)):
         item = ds[i]
-        question = item["prompt"]
+        question = item[key]
+        if isinstance(question, list):
+            question = question[0]
         enumattack_to_audit = replace_placeholder(enumattack_str, question)
         if not use_omni:
             is_safe = audit(enumattack_to_audit, tokenizer, model)
@@ -166,7 +179,7 @@ async def eval_dictattack_with_llamaguard(assemble_model: str = "gpt-4o-mini", a
 
 # eval_enumattack_with_llamaguard()
 
-eval_enumattack_with_llamaguard(use_omni=True)
+eval_enumattack_with_llamaguard(use_omni=False)
 
 # test dictattck with different assemble_num
 
