@@ -1,55 +1,43 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-# two value, ASR and StrongREJECT score
-vllm_xgrammar = [0.992, 0.951]
-vllm_outlines = [0.987, 0.884]
+# ASR scores only
+vllm_xgrammar_asr = 0.992
+vllm_outlines_asr = 0.987
+sglang_xgrammar_asr = 0.994
+sglang_outlines_asr = 0.979
 
-sglang_xgrammar = [0.994, 0.926]
-sglang_outlines = [0.979, 0.909]
+# 创建单个图表，只显示 ASR
+width = 0.6  # 增大柱状图宽度，让柱子更紧凑
+fig, ax = plt.subplots(figsize=(11, 4))
 
-# 修改：创建两个子图
-width = 0.15  # 柱状图宽度
-fig, axs = plt.subplots(1, 2, figsize=(11, 5))
-metrics = ["ASR", "StrongREJECT"]
-scores = [
-    [vllm_xgrammar[0], vllm_outlines[0], sglang_xgrammar[0], sglang_outlines[0]],
-    [vllm_xgrammar[1], vllm_outlines[1], sglang_xgrammar[1], sglang_outlines[1]]
-]
+asr_scores = [vllm_xgrammar_asr, vllm_outlines_asr, sglang_xgrammar_asr, sglang_outlines_asr]
 labels = ["VLLM XGrammar", "VLLM Outlines", "SGLang XGrammar", "SGLang Outlines"]
 
-for i, ax in enumerate(axs):
-    # 绘制每个子图上的四个柱状图（只有一个柱状图组）
-    x_pos = np.array([0])
-    r1 = ax.bar(x_pos - width, scores[i][0], width, label=labels[0])
-    r2 = ax.bar(x_pos,         scores[i][1], width, label=labels[1])
-    r3 = ax.bar(x_pos + width,   scores[i][2], width, label=labels[2])
-    r4 = ax.bar(x_pos + 2*width, scores[i][3], width, label=labels[3])
-    ax.set_title(metrics[i], fontsize=16)  # 设置子图标题为指标
-    ax.set_xticks(x_pos)
-    ax.set_xticklabels([""])  # 不需要显示 x 刻度标签
-    ax.tick_params(axis="both", labelsize=14)
-    ax.set_ylim(0, 1.05)
-    # 数值注解函数（共用）
-    def autolabel(rects):
-        for rect in rects:
-            height = rect.get_height()
-            ax.annotate(f"{height:.3f}",
-                        xy=(rect.get_x() + rect.get_width() / 2, height),
-                        xytext=(0, 1),
-                        textcoords="offset points",
-                        ha='center', va='bottom',
-                        fontsize=12)
-    autolabel(r1)
-    autolabel(r2)
-    autolabel(r3)
-    autolabel(r4)
+# 绘制四个柱状图，调整间距让柱子更紧凑
+x_pos = np.arange(len(labels)) * 0.8  # 减小间距系数
+bars = ax.bar(x_pos, asr_scores, width, color=['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728'])
 
-# 添加共用 y 轴标签
-# fig.text(0.04, 0.5, 'Scores', va='center', rotation='vertical', fontsize=16)
-# 共用图例，放在图表下方居中
-fig.legend(labels, loc="upper center", bbox_to_anchor=(0.5, -0.05), ncol=4, fontsize=12)
-plt.suptitle("Enum Attack on Llama-3.1-8B with different backends", fontsize=16)
-# 调整布局以显示图例
-plt.tight_layout(rect=[0, 0.05, 1, 1])
-plt.savefig("figures/backend_diff.pdf", bbox_inches="tight")
+ax.set_title("ASR - Enum Attack on Llama-3.1-8B with different backends", fontsize=20)  # 增大标题字体
+ax.set_xlabel("Backends", fontsize=18)  # 增大轴标签字体
+ax.set_ylabel("ASR Score", fontsize=18)  # 增大轴标签字体
+ax.set_xticks(x_pos)
+ax.set_xticklabels(labels, fontsize=16)  # 增大刻度标签字体
+ax.tick_params(axis="both", labelsize=16)  # 增大刻度字体
+ax.set_ylim(0, 1.1)
+
+# 数值注解
+def autolabel(rects):
+    for rect in rects:
+        height = rect.get_height()
+        ax.annotate(f"{height:.3f}",
+                    xy=(rect.get_x() + rect.get_width() / 2, height),
+                    xytext=(0, 3),
+                    textcoords="offset points",
+                    ha='center', va='bottom',
+                    fontsize=16)  # 增大数值标注字体
+
+autolabel(bars)
+
+plt.tight_layout()
+plt.savefig("figures/backend_diff_asr.pdf", bbox_inches="tight")
