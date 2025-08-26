@@ -275,7 +275,6 @@ class DictAttack:
         question_words = [s.lower() for s in cleared_question.split(' ')]
         word_set = set()
         for word in question_words:
-            assert word.islower()
             word_set.add(word)
             if self.assemble_num > 0:
                 similar_words = await self.similar_words(word)
