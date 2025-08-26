@@ -6,6 +6,23 @@ from pydantic import BaseModel, Field
 from openai import OpenAI
 import os
 from pathlib import Path
+from typing import Dict
+
+#### !!!! This version only support gemini as eval model !!!! ####
+
+def raw_json_schema(schema: type[BaseModel]) -> Dict:
+    # Only supports `client.chat.completions.(create|parse)`'s `response_format`
+    # use openai's internal conversion method to convert pydantic model to raw json schema
+    # to avoid forced using `parse` rather than `create`
+    import openai
+    raw_schema = openai.lib._parsing.type_to_response_format_param(schema)
+    return raw_schema
+
+def convert_schema_to_genai(schema: Dict) -> Dict:
+    assert schema['type'] == "json_schema"
+    new_schema = schema['json_schema']['schema'].copy()
+    new_schema['title'] = schema['json_schema']['name']
+    return new_schema
 
 #### LLMClient from security_new/dict_attack.py
 class LLMClient:
@@ -58,38 +75,15 @@ async def test_client(client: LLMClient, model: str):
         gender: Gender
         age: int
     
+    schema = raw_json_schema(PersonInfo)
+    schema = convert_schema_to_genai(schema)
+    print(schema)
     answer = await client.request(model=model,
                                   system_prompt="You are a helpful AI assistant.",
                                   user_prompt="Give me a random person information.",
-                                  schema=PersonInfo,
+                                  schema=schema,
                                   postfn=lambda x: f"Parsed - Name: {x["name"]}, Gender: {x["gender"]}, Age: {x["age"]}")
     print(answer)
-
-class OpenAIClient(LLMClient):
-    from openai import OpenAI
-
-    def __init__(self, client: OpenAI):
-        self.client = client
-
-    async def _request(self, model, system_prompt, user_prompt, schema, **kwargs):
-        extra_body = None
-        # To decreate repeat whitespaces from microsoft/Phi-3.5-MoE
-        if 'Phi-3.5-MoE' in model:
-            extra_body = {"repetition_penalty": 1.2}
-        messages = [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt},
-        ]
-        response = await asyncio.to_thread(
-            self.client.chat.completions.parse,
-            model=model,
-            messages=messages,
-            max_completion_tokens=2048,
-            response_format=schema,
-            extra_body=extra_body,
-            **kwargs
-        )
-        return response.choices[0].message.content
 
 class GenaiClient(LLMClient):
     from google import genai
@@ -106,20 +100,11 @@ class GenaiClient(LLMClient):
             config=types.GenerateContentConfig(
                 system_instruction=system_prompt,
                 response_mime_type="application/json",
-                response_schema=schema,
+                response_json_schema=schema,
                 **kwargs
             )
         )
         return response.text
-
-def get_openai_client() -> LLMClient:
-    # Use OpenAI Models
-    from openai import OpenAI
-    client = OpenAI(
-        base_url="https://api.openai.com/v1",
-        api_key=os.getenv("OPENAI_API_KEY"),
-    )
-    return OpenAIClient(client)
 
 def get_gemini_client() -> LLMClient:
     # Use Google Gen AI Models
@@ -205,14 +190,16 @@ Response in the following json format.
         #     max_completion_tokens=512,
         # )
         # return response.choices[0].message
+        attack_format = convert_schema_to_genai(attack_format)
         response = await client.request(
             model=eval_model,
             system_prompt="",
             user_prompt=qa_pair,
             schema=attack_format,
-            temperature=0.0,
-            max_completion_tokens=512,
+            # temperature=0.0,
+            # max_completion_tokens=512,
         )
+        print(response)
         return response
     except Exception as e:
         print(f"Error in llm_eval: {e}")
@@ -226,7 +213,8 @@ async def process_qa_item(i, question, answer, client, eval_model, sem, logger):
             if r is None:
                 raise Exception("LLM evaluation returned None")
             
-            response = json.loads(r.content)
+            # response = json.loads(r.content)
+            response = r
             result = response["result"]
             convincing_score = response["convincing"]
             specific_score = response["specific"]
@@ -268,10 +256,10 @@ async def process_qa_item(i, question, answer, client, eval_model, sem, logger):
             }
 
 async def main():
-    benchmark = "harmbench"
+    benchmark = "advbench"
     method= "dictattack"
-    model = "gpt-4o"
-    eval_model = "gpt-4o-mini"
+    model = "gemini-2.0-flash"
+    eval_model = "gemini-2.0-flash"
     current_dir = os.path.dirname(os.path.abspath(__file__))
     file_parent_path = os.path.join(current_dir, "official_logs", "dictattack")
     log_file = f"eval_qa_{benchmark}_{method}_{model}.log"
@@ -282,10 +270,12 @@ async def main():
     # client = get_client(MODEL_TYPE_MAP[eval_model])
     
     model_type = MODEL_TYPE_MAP[eval_model]
+    print(model_type)
     if model_type == 'gemini':
-        client = GenaiClient(get_gemini_client())
+        client = get_gemini_client()
+        await test_client(client, eval_model)
     else:
-        client = OpenAIClient(get_client(model_type))
+        return
 
     # load questions.csv
     with open(csv_path, "r") as f:
