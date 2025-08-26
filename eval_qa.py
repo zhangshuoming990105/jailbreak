@@ -136,7 +136,7 @@ async def process_qa_item(i, question, answer, client, eval_model, sem, logger):
             }
 
 async def main():
-    benchmark = "harmbench"
+    benchmark = "strongreject"
     method= "dictattack"
     model = "gpt-4o"
     eval_model = "gpt-4o-mini"
