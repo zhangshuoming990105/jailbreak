@@ -136,9 +136,9 @@ async def process_qa_item(i, question, answer, client, eval_model, sem, logger):
             }
 
 async def main():
-    benchmark = "strongreject"
+    benchmark = "harmbench"
     method= "dictattack"
-    model = "gpt-4o-mini"
+    model = "gpt-4o"
     eval_model = "gpt-4o-mini"
     current_dir = os.path.dirname(os.path.abspath(__file__))
     file_parent_path = os.path.join(current_dir, "official_logs", "dictattack")
