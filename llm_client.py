@@ -92,7 +92,7 @@ class VllmClient(LLMClient):
         extra_body = {
             "repetition_penalty": 1.2,
         }
-        if schema:
+        if schema: # Only supports pydantic model
             kwargs['response_format'] = {
                 "type": "json_schema",
                 "json_schema": {
@@ -120,8 +120,7 @@ class GenaiClient(LLMClient):
 
     async def _request(self, model, system_prompt, user_prompt, schema, **kwargs):
         from google.genai import types
-        # Only supports pydantic schema
-        if schema:
+        if schema: # Only supports pydantic model
             kwargs['response_mime_type'] = "application/json"
             kwargs['response_schema'] = schema
         if system_prompt:
@@ -153,6 +152,15 @@ async def test_client(client: LLMClient, model: str):
                                   postfn=lambda x: f"Parsed - Name: {x["name"]}, Gender: {x["gender"]}, Age: {x["age"]}")
     print(answer)
 
+def get_model_type(model: str) -> str:
+    if model.startswith('gpt'):
+        return 'openai'
+    elif model.startswith('gemini'):
+        return 'gemini'
+    elif '/' in model:  # a huggingface or local path
+        return 'vllm'
+    else:
+        raise ValueError("Unsupported model")
 
 def get_client(model_type: str) -> LLMClient:
     if model_type == 'openai':
@@ -176,4 +184,7 @@ def get_client(model_type: str) -> LLMClient:
         )
         return GenaiClient(client)
     else:
-        raise ValueError(f"Invalid model type for get_llm_client")
+        raise ValueError("Invalid model type for get_client")
+
+def get_client_by_model(model: str) -> LLMClient:
+    return get_client(get_model_type(model))

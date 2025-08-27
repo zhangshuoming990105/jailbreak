@@ -8,15 +8,16 @@ import sys
 import asyncio
 from loguru import logger
 
-from llm_client import LLMClient, get_client
+from llm_client import LLMClient, get_client_by_model
+
+class DictAssembleConfig(BaseModel):
+    model: str
+    num: int
 
 class DictAttackConfig(BaseModel):
-    attack_client: str
-    attack_model: str
-    assemble_client: str
-    assemble_model: str
-    assemble_num: int
+    model: str
     dataset_name: str
+    dict_assemble: DictAssembleConfig
 
     @classmethod
     def from_json_file(cls, filename: str):
@@ -224,14 +225,14 @@ async def main(config: DictAttackConfig):
     begin_id = 0
     end_id = 1
 
-    client = get_client(config.attack_client)
-    model = config.attack_model
+    model = config.model
+    client = get_client_by_model(model)
 
-    assemble_client = get_client(config.assemble_client)
-    assemble_model = config.assemble_model
-    assemble_num = config.assemble_num
+    assemble_model = config.dict_assemble.model
+    assemble_num = config.dict_assemble.num
+    assemble_client = get_client_by_model(assemble_model)
 
-    model_name = os.path.basename(model)
+    log_model_name = os.path.basename(model)    # for local/hf models
 
     if dataset_name == "advbench":
         ds = load_dataset("walledai/AdvBench")["train"]
@@ -270,7 +271,7 @@ async def main(config: DictAttackConfig):
         end_id = 313
         question_loader = lambda item: item[question_key]
 
-    log_file = f"dictattack_{dataset_name}_{model_name}.log"
+    log_file = f"dictattack_{dataset_name}_{log_model_name}.log"
     logger.add(
         log_file if log_file else sys.stderr,
         level="INFO",
@@ -285,7 +286,7 @@ async def main(config: DictAttackConfig):
     )
     
     # CSV 文件名
-    csv_filename = f"qa_{dataset_name}_dictattack_{model_name}.csv"
+    csv_filename = f"qa_{dataset_name}_dictattack_{log_model_name}.csv"
     
     # 初始化 CSV 文件并写入表头
     with open(csv_filename, "w", newline='', encoding='utf-8') as f:
@@ -336,12 +337,12 @@ async def main(config: DictAttackConfig):
         raise
 
 async def single_main(config: DictAttackConfig):
-    client = get_client(config.attack_client)
-    model = config.attack_model
-    
-    assemble_client = get_client(config.assemble_client)
-    assemble_model = config.assemble_model
-    assemble_num = config.assemble_num
+    model = config.model
+    client = get_client_by_model(model)
+
+    assemble_model = config.dict_assemble.model
+    assemble_num = config.dict_assemble.num
+    assemble_client = get_client_by_model(assemble_model)
 
     attack = DictAttack(
         client=client, 

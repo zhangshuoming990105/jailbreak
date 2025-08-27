@@ -1,1 +1,1 @@
-{"assemble_client": "openai", "assemble_model": "gpt-4o-mini", "assemble_num": 1, "attack_client": "gemini", "attack_model": "gemini-2.0-flash", "dataset_name": "advbench"}
+{"dict_assemble": {"model": "gpt-4o-mini", "num": 1}, "model": "gemini-2.0-flash", "dataset_name": "advbench"}
