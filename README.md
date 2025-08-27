@@ -16,5 +16,12 @@
 
 ## Evaluation commands
 
+Figure 7: run the following commands:
+python figures/figure_7_1_analyze_logit_beam.py --> "logit_beam_analyze_5.log"
+python figures/figure_7_2_draw_logit_shift.py, replacing the intital values with the newest values in log --> Figure 7
+
+Figure 8: run the following command:
+python figures/figure8_analyze_logit.py --> the extracted topk tokens --> drawing using ppt
+
 ## Hardware requirements
 
