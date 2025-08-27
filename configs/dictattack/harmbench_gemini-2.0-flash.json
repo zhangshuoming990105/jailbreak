@@ -1,0 +1,1 @@
+{"assemble_client": "openai", "assemble_model": "gpt-4o-mini", "assemble_num": 1, "attack_client": "gemini", "attack_model": "gemini-2.0-flash", "dataset_name": "harmbench"}
