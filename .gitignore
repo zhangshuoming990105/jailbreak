@@ -1,0 +1,7 @@
+.vscode
+__pycache__
+.venv
+
+# Official logs should be added by `git add -f`
+*.log
+*.csv
