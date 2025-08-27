@@ -60,6 +60,8 @@ class OpenAIClient(LLMClient):
 
     async def _request(self, model, system_prompt, user_prompt, schema, **kwargs):
         extra_body = None
+        if not system_prompt:
+            system_prompt = ''
         messages = [
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt},
@@ -83,6 +85,9 @@ class VllmClient(LLMClient):
         self.client = client
 
     async def _request(self, model, system_prompt, user_prompt, schema, **kwargs):
+        if not system_prompt:
+            system_prompt = ''
+
         messages = [
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt},
