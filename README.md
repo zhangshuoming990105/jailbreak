@@ -57,3 +57,6 @@ All configurations are listed at `configs/dictattack`. Below is an example:
 ```bash
 python3 -u dict_attack.py -c configs/dictattack/advbench_gpt-4o.json
 ```
+
+### Eval QA
+
