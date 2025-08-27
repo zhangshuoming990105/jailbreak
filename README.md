@@ -41,3 +41,19 @@ Install dependencies:
 pip install -r requirements.txt
 ```
 
+Set OpenAI/Gemini API Key (if required):
+
+```bash
+export OPENAI_API_KEY=<your key>
+export GEMINI_API_KEY=<your key>
+```
+
+## Commands
+
+### Dict Attack
+
+All configurations are listed at `configs/dictattack`. Below is an example:
+
+```bash
+python3 -u dict_attack.py -c configs/dictattack/advbench_gpt-4o.json
+```
