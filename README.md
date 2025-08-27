@@ -58,5 +58,24 @@ All configurations are listed at `configs/dictattack`. Below is an example:
 python3 -u dict_attack.py -c configs/dictattack/advbench_gpt-4o.json
 ```
 
+The output is a log file and Q/A csv.
+
 ### Eval QA
 
+All configurations are listed at `configs/eval_qa`. Official logs in `official_logs/<method>` is required. Below is an example:
+
+```bash
+python3 -u eval_qa.py -c configs/eval_qa/dictattack/dictattack_advbench_gpt-4o.json
+```
+
+The output is a log file with summary at the bottom.
+
+### Audit
+
+All configurations are listed at `configs/audit`. Below is an example:
+
+```bash
+python3 -u audit.py -c configs/audit/dictattack_advbench_full_k1_llamaguard.json
+```
+
+Llama guard requires a vLLM instance to serve. The output is a logfile with summary at the bottom.

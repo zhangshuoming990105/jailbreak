@@ -60,12 +60,11 @@ class OpenAIClient(LLMClient):
 
     async def _request(self, model, system_prompt, user_prompt, schema, **kwargs):
         extra_body = None
-        if not system_prompt:
-            system_prompt = ''
-        messages = [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt},
-        ]
+        
+        messages = []
+        if system_prompt:
+            messages.append({"role": "system", "content": system_prompt})
+        messages.append({"role": "user", "content": user_prompt})
         if schema:
             kwargs['response_format'] = schema
         response = await asyncio.to_thread(
@@ -85,13 +84,10 @@ class VllmClient(LLMClient):
         self.client = client
 
     async def _request(self, model, system_prompt, user_prompt, schema, **kwargs):
-        if not system_prompt:
-            system_prompt = ''
-
-        messages = [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt},
-        ]
+        messages = []
+        if system_prompt:
+            messages.append({"role": "system", "content": system_prompt})
+        messages.append({"role": "user", "content": user_prompt})
 
         # To decreate repeat whitespaces from microsoft/Phi-3.5-MoE
         extra_body = {

@@ -1,0 +1,1 @@
+{"dataset_name": "advbench", "eval_method": "moderation", "attack_method": "dictattack", "audit_component": "grammar", "dict_assemble": {"model": "gpt-4o", "num": 0}}
