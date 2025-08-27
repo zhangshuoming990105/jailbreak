@@ -218,10 +218,8 @@ class Dictionary(BaseModel):
                 logger.info(audit_pattern)
             if judge_model == "moderation_api":
                 is_safe = await audit_omni(audit_pattern)
-            else:
-    
             # is_safe = audit_omni(audit_pattern)
-            if judge_model == 'llamaguard':
+            elif judge_model == 'llamaguard':
                 is_safe = audit_llamaguard_vllm(audit_pattern)
             else:
                 is_safe = await audit_llm(audit_pattern, judge_model)
@@ -236,8 +234,8 @@ class Dictionary(BaseModel):
             async with sem:
                 return await process_item_unsync(i)
         tasks.append(asyncio.create_task(process_item_sync(i)))
-        # if i == 520:
-        if i == 100:
+        if i == 520:
+        # if i == 100:
             break
     results = await asyncio.gather(*tasks, return_exceptions=True)
     num_safe = len(list(filter(lambda x: x is True, results)))
@@ -314,7 +312,6 @@ async def eval_dictattack_with_llamaguard(assemble_model: str = "gpt-4o-mini", a
     logger.info(f"dictattack_unsafe: {dictattack_unsafe}")
 
 
-asyncio.run(eval_dictattack_with_llm(assemble_num=1,judge_model="gpt-4o"))
 asyncio.run(eval_dictattack_with_llm(assemble_num=1,judge_model="gpt-4o"))
 
 # test enumattack
