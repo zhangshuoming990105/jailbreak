@@ -136,6 +136,32 @@ class GenaiClient(LLMClient):
         )
         return response.text
 
+
+class OpenRouterClient(LLMClient):
+    import openai
+
+    def __init__(self, client: openai.OpenAI):
+        self.client = client
+
+    async def _request(self, model, system_prompt, user_prompt, schema, **kwargs):
+        messages = []
+        if system_prompt:
+            messages.append({"role": "system", "content": system_prompt})
+        messages.append({"role": "user", "content": user_prompt})
+        if schema:
+            kwargs['response_format'] = schema
+
+        # Remove openrouter/ prefix when calling the API
+        api_model = model.replace('openrouter/', '')
+
+        response = await asyncio.to_thread(
+            self.client.chat.completions.parse,
+            model=api_model,
+            messages=messages,
+            **kwargs
+        )
+        return response.choices[0].message.content
+
 async def test_client(client: LLMClient, model: str):
     class Gender(str, Enum):
         male: str = "Male"
@@ -154,7 +180,9 @@ async def test_client(client: LLMClient, model: str):
     print(answer)
 
 def get_model_type(model: str) -> str:
-    if model.startswith('gpt'):
+    if model.startswith('openrouter/'):
+        return 'openrouter'
+    elif model.startswith('gpt'):
         return 'openai'
     elif model.startswith('gemini'):
         return 'gemini'
@@ -171,6 +199,13 @@ def get_client(model_type: str) -> LLMClient:
             api_key=os.getenv("OPENAI_API_KEY"),
         )
         return OpenAIClient(client)
+    elif model_type == 'openrouter':
+        from openai import OpenAI
+        client = OpenAI(
+            base_url="https://openrouter.ai/api/v1",
+            api_key=os.getenv("OPENROUTER_API_KEY"),
+        )
+        return OpenRouterClient(client)
     elif model_type == 'vllm':
         # Use vLLM Models
         from openai import OpenAI

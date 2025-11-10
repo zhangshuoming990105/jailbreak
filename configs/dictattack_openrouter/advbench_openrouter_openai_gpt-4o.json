@@ -1,0 +1,10 @@
+{
+  "dict_assemble": {
+    "model": "openrouter/openai/gpt-4o-mini",
+    "num": 1
+  },
+  "model": "openrouter/openai/gpt-4o",
+  "dataset_name": "advbench",
+  "begin_id": 0,
+  "end_id": 520
+}

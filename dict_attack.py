@@ -18,12 +18,14 @@ class DictAttackConfig(BaseModel):
     model: str
     dataset_name: str
     dict_assemble: DictAssembleConfig
+    begin_id: int = 0
+    end_id: int = 1
 
     @classmethod
     def from_json_file(cls, filename: str):
         with open(filename, "r") as fp:
             json_str = fp.read()
-        
+
         return cls.model_validate_json(json_str)
 
 class DictAttack:
@@ -222,8 +224,9 @@ def write_csv_row(filename, question, answer):
 async def main(config: DictAttackConfig):
     dataset_name = config.dataset_name
     sub_dataset_name="base"
-    begin_id = 0
-    end_id = 1
+    # Use config values if available, otherwise use defaults for backward compatibility
+    begin_id = getattr(config, 'begin_id', 0)
+    end_id = getattr(config, 'end_id', None)
 
     model = config.model
     client = get_client_by_model(model)
@@ -238,13 +241,15 @@ async def main(config: DictAttackConfig):
         ds = load_dataset("walledai/AdvBench")["train"]
         logger.info(ds)
         question_key = "prompt"
-        end_id = 520
+        if end_id is None:
+            end_id = 520
         question_loader = lambda item: item[question_key]
     elif dataset_name == "harmbench":
         ds = load_dataset("walledai/HarmBench", "contextual")["train"]
         logger.info(ds)
         question_key = "prompt"
-        end_id = 100
+        if end_id is None:
+            end_id = 100
         question_loader = lambda item: item[question_key]
     elif dataset_name == "SorryBench":
         ds = load_dataset("sorry-bench/sorry-bench-202503")["train"]
@@ -256,19 +261,22 @@ async def main(config: DictAttackConfig):
         ds = [data for data in ds if data["prompt_style"] == sub_dataset_name]
         logger.info(f"Category {sub_dataset_name} size: {len(ds)}")
         # ds is made up by 21(prompt_style) x 44 x 10(in each category) questions, totally 9240 questions
-        end_id = 440
+        if end_id is None:
+            end_id = 440
         question_loader = lambda item: item[question_key][0]
     elif dataset_name == "JailbreakBench":
         ds = load_dataset("JailbreakBench/JBB-Behaviors", "behaviors")["harmful"]
         logger.info(ds)
         question_key = "Goal"
-        end_id = 100
+        if end_id is None:
+            end_id = 100
         question_loader = lambda item: item[question_key]
     elif dataset_name == "strongreject":
         ds = load_dataset("walledai/StrongREJECT")["train"]
         question_key = "prompt"
         logger.info(ds)
-        end_id = 313
+        if end_id is None:
+            end_id = 313
         question_loader = lambda item: item[question_key]
 
     log_file = f"dictattack_{dataset_name}_{log_model_name}.log"
