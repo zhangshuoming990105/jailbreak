@@ -1,0 +1,20 @@
+{
+  "dict_assemble": {
+    "model": "openrouter/openai/gpt-4o-mini",
+    "num": 1
+  },
+  "model": "openrouter_raw/openai/gpt-oss-120b",
+  "dataset_name": "advbench",
+  "begin_id": 0,
+  "end_id": 520,
+  "success_only": true,
+  "provider": {
+    "order": ["Novita"],
+    "allow_fallbacks": false
+  },
+  "extra_body": {
+    "reasoning": {
+      "enabled": false
+    }
+  }
+}

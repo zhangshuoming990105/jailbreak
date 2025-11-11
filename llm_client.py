@@ -3,6 +3,8 @@ from pydantic import BaseModel
 from enum import Enum
 import asyncio
 import os
+import json
+import requests
 
 # def _raw_json_schema(schema: BaseModel) -> Dict:
 #     # Only supports `client.chat.completions.(create|parse)`'s `response_format`
@@ -137,6 +139,81 @@ class GenaiClient(LLMClient):
         return response.text
 
 
+class RawOpenRouterClient(LLMClient):
+    """Raw OpenRouter client using requests library to support provider specification."""
+
+    def __init__(self, api_key: str = None):
+        self.api_key = api_key or os.getenv("OPENROUTER_API_KEY")
+        self.base_url = "https://openrouter.ai/api/v1"
+
+    async def _request(self, model, system_prompt, user_prompt, schema, **kwargs):
+        headers = {
+            'Authorization': f'Bearer {self.api_key}',
+            'Content-Type': 'application/json',
+        }
+
+        # Build messages array
+        messages = []
+        if system_prompt:
+            messages.append({"role": "system", "content": system_prompt})
+        messages.append({"role": "user", "content": user_prompt})
+
+        # Remove openrouter prefixes if present for API compatibility
+        api_model = model.replace('openrouter/', '').replace('openrouter_raw/', '')
+
+        # Build request body
+        request_data = {
+            "model": api_model,  # Use clean model name for API
+            "messages": messages,
+        }
+
+        # Add response format if schema is provided
+        if schema:
+            if isinstance(schema, type) and issubclass(schema, BaseModel):
+                # Pydantic model
+                request_data["response_format"] = {
+                    "type": "json_schema",
+                    "json_schema": {
+                        "name": "schema",
+                        "schema": schema.model_json_schema(),
+                        "strict": True,
+                    }
+                }
+            elif isinstance(schema, dict):
+                # Raw dict schema
+                request_data["response_format"] = schema
+
+        # Add provider configuration if specified in kwargs (only available for raw client)
+        if 'provider' in kwargs:
+            request_data["provider"] = kwargs.pop('provider')
+
+        # Add extra_body configuration if specified in kwargs (only available for raw client)
+        if 'extra_body' in kwargs:
+            request_data["extra_body"] = kwargs.pop('extra_body')
+
+        # Add other kwargs to request data
+        for key, value in kwargs.items():
+            if key not in ['messages', 'model', 'response_format', 'provider', 'extra_body']:
+                request_data[key] = value
+
+        # Set default max_tokens if not provided
+        if 'max_tokens' not in request_data:
+            request_data['max_tokens'] = 8192
+
+        # Make the request using requests in a thread
+        def make_request():
+            response = requests.post(
+                url=f"{self.base_url}/chat/completions",
+                headers=headers,
+                data=json.dumps(request_data)
+            )
+            response.raise_for_status()
+            return response.json()
+
+        response_json = await asyncio.to_thread(make_request)
+        return response_json['choices'][0]['message']['content']
+
+
 class OpenRouterClient(LLMClient):
     import openai
 
@@ -192,7 +269,9 @@ async def test_client(client: LLMClient, model: str):
     print(answer)
 
 def get_model_type(model: str) -> str:
-    if model.startswith('openrouter/'):
+    if model.startswith('openrouter_raw/'):
+        return 'openrouter_raw'
+    elif model.startswith('openrouter/'):
         return 'openrouter'
     elif model.startswith('gpt'):
         return 'openai'
@@ -218,6 +297,8 @@ def get_client(model_type: str) -> LLMClient:
             api_key=os.getenv("OPENROUTER_API_KEY"),
         )
         return OpenRouterClient(client)
+    elif model_type == 'openrouter_raw':
+        return RawOpenRouterClient()
     elif model_type == 'vllm':
         # Use vLLM Models
         from openai import OpenAI
