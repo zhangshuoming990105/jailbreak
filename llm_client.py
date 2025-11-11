@@ -154,6 +154,18 @@ class OpenRouterClient(LLMClient):
         # Remove openrouter/ prefix when calling the API
         api_model = model.replace('openrouter/', '')
 
+        # Set minimal reasoning effort for thinking models
+        # This applies to models like GPT-5-mini, GPT-5 that have reasoning capabilities
+        # if any(thinking_model in api_model for thinking_model in ['openai/gpt-5-mini', 'openai/gpt-5']):
+        #     # Use OpenRouter's reasoning parameters to minimize effort
+        #     kwargs['reasoning'] = {
+        #         'max_effort': 'minimal'
+        #     }
+
+        # Set max_tokens to prevent hanging and token limit errors
+        if 'max_tokens' not in kwargs:
+            kwargs['max_tokens'] = 8192
+
         response = await asyncio.to_thread(
             self.client.chat.completions.parse,
             model=api_model,

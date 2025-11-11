@@ -3,9 +3,9 @@
     "model": "openrouter/openai/gpt-4o-mini",
     "num": 1
   },
-  "model": "openrouter/openai/gpt-4o",
+  "model": "openrouter/openai/gpt-oss-120b",
   "dataset_name": "advbench",
   "begin_id": 0,
-  "end_id": 3,
+  "end_id": 520,
   "success_only": true
 }

@@ -20,6 +20,7 @@ class DictAttackConfig(BaseModel):
     dict_assemble: DictAssembleConfig
     begin_id: int = 0
     end_id: int = 1
+    success_only: bool = False
 
     @classmethod
     def from_json_file(cls, filename: str):
@@ -185,33 +186,37 @@ async def apply_single_attack(attack: DictAttack, question: str, index: int = No
             
     return real_question, answer
 
-async def process_item(i, item, attack: DictAttack, question_loader: callable, sem, csv_lock, csv_filename):
+async def process_item(i, item, attack: DictAttack, question_loader: callable, sem, csv_lock, csv_filename, success_only: bool = False):
     """处理单个数据项的异步函数"""
     async with sem:
         try:
             question = question_loader(item)
             real_question, answer = await apply_single_attack(attack, question, i)
-            
+
             # 立即写入 CSV 文件，使用锁保护
             async with csv_lock:
                 await asyncio.to_thread(write_csv_row, csv_filename, real_question, answer)
-            
+
             return real_question, answer
-            
+
         except Exception as e:
             error_msg = f"Item {i} - Error processing item: {type(e).__name__}: {str(e)}"
             logger.error(error_msg)
-            
-            # 尝试写入错误记录到CSV
-            try:
-                error_question = item.get("prompt", "Unknown question")
-                error_answer = f"ERROR: {type(e).__name__}: {str(e)}"
-                async with csv_lock:
-                    await asyncio.to_thread(write_csv_row, csv_filename, error_question, error_answer)
-                logger.info(f"Item {i} - Error record saved to CSV")
-            except Exception as csv_error:
-                logger.error(f"Item {i} - Failed to save error record to CSV: {csv_error}")
-            
+
+            # 如果 success_only 为 True，则不写入错误记录到CSV
+            if not success_only:
+                # 尝试写入错误记录到CSV
+                try:
+                    error_question = item.get("prompt", "Unknown question")
+                    error_answer = f"ERROR: {type(e).__name__}: {str(e)}"
+                    async with csv_lock:
+                        await asyncio.to_thread(write_csv_row, csv_filename, error_question, error_answer)
+                    logger.info(f"Item {i} - Error record saved to CSV")
+                except Exception as csv_error:
+                    logger.error(f"Item {i} - Failed to save error record to CSV: {csv_error}")
+            else:
+                logger.info(f"Item {i} - Error record skipped due to success_only=True")
+
             # 返回错误信息而不是抛出异常，这样不会影响其他任务
             return item.get("prompt", "Unknown question"), f"ERROR: {type(e).__name__}: {str(e)}"
 
@@ -309,7 +314,7 @@ async def main(config: DictAttackConfig):
     tasks = []
     for i in range(begin_id, end_id):
         item = ds[i]
-        tasks.append(asyncio.create_task(process_item(i, item, attack, question_loader, sem, csv_lock, csv_filename)))
+        tasks.append(asyncio.create_task(process_item(i, item, attack, question_loader, sem, csv_lock, csv_filename, config.success_only)))
     
     # 并行执行所有任务
     try:

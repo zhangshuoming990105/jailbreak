@@ -1,0 +1,5 @@
+{
+    "model": "openrouter/deepseek-r1-0528",
+    "dataset_name": "advbench",
+    "method": "dictattack"
+  }

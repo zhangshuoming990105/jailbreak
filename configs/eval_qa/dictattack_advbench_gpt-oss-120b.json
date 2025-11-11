@@ -1,0 +1,5 @@
+{
+    "model": "openrouter/openai/gpt-oss-120b",
+    "dataset_name": "advbench",
+    "method": "dictattack"
+  }

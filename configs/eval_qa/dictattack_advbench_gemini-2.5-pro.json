@@ -1,0 +1,5 @@
+{
+  "model": "openrouter/google/gemini-2.5-pro",
+  "dataset_name": "advbench",
+  "method": "dictattack"
+}

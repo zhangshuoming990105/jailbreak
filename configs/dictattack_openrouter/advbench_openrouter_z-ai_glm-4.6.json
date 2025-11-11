@@ -3,7 +3,7 @@
     "model": "openrouter/openai/gpt-4o-mini",
     "num": 1
   },
-  "model": "openrouter/openai/gpt-4o",
+  "model": "openrouter/z-ai/glm-4.6",
   "dataset_name": "advbench",
   "begin_id": 0,
   "end_id": 3,
