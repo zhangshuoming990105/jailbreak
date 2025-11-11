@@ -1,0 +1,14 @@
+{
+  "dataset_name": "advbench",
+  "eval_method": "selfdefend",
+  "attack_method": "dictattack",
+  "audit_component": "prompt",
+  "dict_assemble": {
+    "model": "openrouter/openai/gpt-4o-mini",
+    "num": 1
+  },
+  "selfdefend_model": "openrouter/openai/gpt-4o",
+  "selfdefend_style": "intent_tuning",
+  "begin_id": 0,
+  "end_id": 520
+}

@@ -2,6 +2,7 @@
 __pycache__
 .venv
 .claude
+3rdparty
 
 # Official logs should be added by `git add -f`
 *.log
