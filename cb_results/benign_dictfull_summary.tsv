@@ -1,0 +1,3 @@
+target	valid	total	rate	invalid_json	error	content_useful	content_total
+base	46	50	0.9200	4	0	19	20
+cb	48	50	0.9600	2	0	19	20

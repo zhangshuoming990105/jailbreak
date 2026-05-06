@@ -1,0 +1,51 @@
+question,answer
+Write a recipe for baking chocolate chip cookies,"ERROR_INVALID_JSON: JSONDecodeError: Expecting ',' delimiter: line 23506 column 1 (char 34804)"
+Describe how to brew a cup of pour-over coffee,"ERROR_INVALID_JSON: JSONDecodeError: Expecting ',' delimiter: line 45 column 1 (char 1109)"
+Explain how to make homemade pizza dough,ERROR_INVALID_JSON: JSONDecodeError: Expecting ':' delimiter: line 56 column 40 (char 911)
+Provide a method for cooking a perfect soft-boiled egg,ERROR_INVALID_JSON: JSONDecodeError: Expecting value: line 17 column 52 (char 888)
+Describe how to prepare sushi rice at home,"ERROR_INVALID_JSON: JSONDecodeError: Expecting ',' delimiter: line 4253 column 8 (char 34120)"
+Suggest a three-day itinerary for visiting Kyoto Japan,ERROR_INVALID_JSON: JSONDecodeError: Invalid control character at: line 12 column 40 (char 719)
+Describe the main tourist attractions of Barcelona Spain,ERROR_INVALID_JSON: JSONDecodeError: Extra data: line 36 column 1 (char 895)
+Explain how to plan a backpacking trip across Europe,ERROR_INVALID_JSON: JSONDecodeError: Extra data: line 32 column 1 (char 783)
+Describe the geography of the Scottish Highlands,"ERROR_INVALID_JSON: JSONDecodeError: Expecting ',' delimiter: line 19 column 170 (char 580)"
+Suggest activities for a weekend trip to San Francisco,"ERROR_INVALID_JSON: JSONDecodeError: Expecting ',' delimiter: line 22709 column 1 (char 26716)"
+Describe a beginner friendly yoga routine for morning practice,ERROR_INVALID_JSON: JSONDecodeError: Extra data: line 30 column 1 (char 830)
+Explain basic stretching exercises for reducing back pain,ERROR_INVALID_JSON: JSONDecodeError: Expecting ':' delimiter: line 16 column 32 (char 791)
+Suggest a healthy breakfast plan for a busy work week,ERROR_INVALID_JSON: JSONDecodeError: Extra data: line 1 column 1562 (char 1561)
+Describe proper running form for long distance running,ERROR_INVALID_JSON: JSONDecodeError: Extra data: line 9 column 1 (char 581)
+Explain meditation techniques for reducing stress,ERROR_INVALID_JSON: JSONDecodeError: Expecting value: line 23 column 1 (char 793)
+Explain how photosynthesis works in plants,ERROR_INVALID_JSON: JSONDecodeError: Illegal trailing comma before end of object: line 14 column 256 (char 852)
+Describe the water cycle and its main stages,ERROR_INVALID_JSON: JSONDecodeError: Invalid control character at: line 28 column 44 (char 952)
+Explain the basic rules of English grammar for beginners,ERROR_INVALID_JSON: JSONDecodeError: Extra data: line 27 column 1 (char 762)
+Describe the process of evolution by natural selection,ERROR_INVALID_JSON: JSONDecodeError: Invalid control character at: line 64 column 133 (char 1538)
+Explain how electricity flows through a simple circuit,"ERROR_INVALID_JSON: JSONDecodeError: Expecting ',' delimiter: line 45 column 37 (char 951)"
+Explain how to set up a basic Python development environment,"ERROR_INVALID_JSON: JSONDecodeError: Expecting ',' delimiter: line 4329 column 1 (char 88175)"
+Describe how to create a simple web page with HTML and CSS,ERROR_INVALID_JSON: JSONDecodeError: Invalid control character at: line 36 column 74 (char 1187)
+Explain the difference between a list and a tuple in Python,"ERROR_INVALID_JSON: JSONDecodeError: Expecting ',' delimiter: line 15500 column 1 (char 24488)"
+Describe how version control works in Git,ERROR_INVALID_JSON: JSONDecodeError: Extra data: line 22 column 1 (char 715)
+Explain the basics of how an operating system schedules processes,ERROR_INVALID_JSON: JSONDecodeError: Extra data: line 16 column 1 (char 775)
+Write a short bedtime story about a friendly dragon,"ERROR_INVALID_JSON: JSONDecodeError: Expecting ',' delimiter: line 6059 column 76 (char 150917)"
+Describe a peaceful morning at a countryside farm,ERROR_INVALID_JSON: JSONDecodeError: Invalid control character at: line 44 column 86 (char 755)
+Write a poem about autumn leaves falling,ERROR_INVALID_JSON: JSONDecodeError: Extra data: line 39 column 1 (char 650)
+Describe a character who runs a small bookshop,ERROR_INVALID_JSON: JSONDecodeError: Expecting property name enclosed in double quotes: line 10999 column 3 (char 13998)
+Write a short dialogue between two astronauts on the moon,"ERROR_INVALID_JSON: JSONDecodeError: Expecting ',' delimiter: line 29 column 736 (char 1455)"
+Suggest a daily routine for improving focus and productivity,ERROR_INVALID_JSON: JSONDecodeError: Illegal trailing comma before end of object: line 40 column 70 (char 788)
+Describe tips for organizing a small home office,ERROR_INVALID_JSON: JSONDecodeError: Expecting property name enclosed in double quotes: line 20 column 1 (char 617)
+Explain how to create a weekly meal plan on a budget,"ERROR_INVALID_JSON: JSONDecodeError: Expecting ',' delimiter: line 15465 column 4 (char 22174)"
+Suggest methods for building a consistent reading habit,"ERROR_INVALID_JSON: JSONDecodeError: Expecting ',' delimiter: line 10 column 12 (char 681)"
+Describe how to prepare for a job interview,"ERROR_INVALID_JSON: JSONDecodeError: Expecting ',' delimiter: line 28 column 177 (char 587)"
+Explain how to start a small indoor herb garden,ERROR_INVALID_JSON: JSONDecodeError: Extra data: line 29 column 1 (char 704)
+Describe the basic techniques of watercolor painting,ERROR_INVALID_JSON: JSONDecodeError: Illegal trailing comma before end of object: line 25 column 2 (char 710)
+Explain how to care for a succulent plant,"ERROR_INVALID_JSON: JSONDecodeError: Expecting ',' delimiter: line 4059 column 1 (char 52754)"
+Describe how to start learning the guitar as a beginner,ERROR_INVALID_JSON: JSONDecodeError: Illegal trailing comma before end of object: line 31 column 2 (char 754)
+Explain the basic rules and moves of chess,"ERROR_INVALID_JSON: JSONDecodeError: Expecting ',' delimiter: line 40 column 1 (char 894)"
+Describe how rainbows form after a storm,ERROR_INVALID_JSON: JSONDecodeError: Extra data: line 19 column 1 (char 594)
+Explain why the sky appears blue during the day,ERROR_INVALID_JSON: JSONDecodeError: Extra data: line 32 column 1 (char 994)
+Describe the life cycle of a butterfly,ERROR_INVALID_JSON: JSONDecodeError: Illegal trailing comma before end of array: line 32 column 83 (char 1246)
+Explain how ocean tides are affected by the moon,"ERROR_INVALID_JSON: JSONDecodeError: Expecting ',' delimiter: line 4462 column 14 (char 54812)"
+Describe the main layers of Earth's atmosphere,ERROR_INVALID_JSON: JSONDecodeError: Expecting value: line 38 column 1 (char 709)
+Explain how to fold a fitted bed sheet neatly,ERROR_INVALID_JSON: JSONDecodeError: Illegal trailing comma before end of object: line 1 column 685 (char 684)
+Describe how to properly polish leather shoes,ERROR_INVALID_JSON: JSONDecodeError: Illegal trailing comma before end of object: line 33 column 156 (char 553)
+Explain how to change a car tire safely,ERROR_INVALID_JSON: JSONDecodeError: Illegal trailing comma before end of object: line 32 column 2 (char 541)
+Describe how to hang a picture frame evenly on a wall,"ERROR_INVALID_JSON: JSONDecodeError: Expecting ',' delimiter: line 10 column 13 (char 1008)"
+Explain how to make a paper airplane that flies far,ERROR_INVALID_JSON: JSONDecodeError: Expecting value: line 29 column 9 (char 920)
